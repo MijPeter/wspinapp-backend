@@ -1,4 +1,6 @@
 # wspinapp-backend
 backend for wspinapp
 
-# current go version 1.19.x
+to run server install go, and simply run main.go with 'go run .'
+
+current go version 1.19.x
