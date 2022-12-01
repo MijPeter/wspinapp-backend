@@ -1,0 +1,7 @@
+version: '2'
+services:
+  wspinapp:
+    restart: "no"
+    build: .
+    ports:
+      - "8080:8080"
