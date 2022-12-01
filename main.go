@@ -4,6 +4,7 @@ import (
 	"example/wspinapp-backend/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type position struct {
@@ -29,30 +30,27 @@ type route struct {
 }
 
 var walls = []wall{
-	{Id: "1", Holds: []hold{}, Image: "image_1.png"},
+	{Id: "0", Holds: []hold{}, Image: "image_1.png"},
 }
+
+var routes []route
 
 func main() {
 	router := gin.Default()
-	router.SetTrustedProxies(nil) // this should be revisited
 	router.GET("/walls", getWalls)
 	router.POST("/walls", addWall)
-	router.GET("/walls/:id", getWall)
+	router.GET("/walls/:wallId", getWall)
+	router.GET("/walls/:wallId/routes", getRoutes)
 
 	router.Run("localhost:8080")
 }
 
-// inner method that should be in an inner layer (touching db)
+// TODO validation should be probably done some other way
 func validateAddWall(err error, newWall wall) *errors.HttpError {
 	if err != nil {
 		return errors.BadRequest
 	}
 
-	for _, existingWall := range walls {
-		if existingWall.Id == newWall.Id {
-			return errors.Conflict
-		}
-	}
 	return nil
 }
 
@@ -71,20 +69,34 @@ func addWall(c *gin.Context) {
 		return
 	}
 
+	newWall.Id = strconv.Itoa(len(walls))
 	walls = append(walls, newWall) // TODO use some kind of db or sth, maybe firestore for now and then as real db
 	c.IndentedJSON(http.StatusCreated, newWall)
 }
 
 func getWall(c *gin.Context) {
-	id := c.Param("id")
+	wallId := c.Param("wallId")
 
 	for _, w := range walls {
-		if w.Id == id {
+		if w.Id == wallId {
 			c.IndentedJSON(http.StatusOK, w)
 			return
 		}
 	}
 
-	err := errors.NotFound
-	c.IndentedJSON(err.Status(), err.Error())
+	httpErr := errors.NotFound
+	c.IndentedJSON(httpErr.Status(), httpErr.Error())
+}
+
+func getRoutes(c *gin.Context) {
+	wallId := c.Param("wallId")
+
+	wallRoutes := make([]route, 0)
+	for _, r := range routes {
+		if r.Wall.Id == wallId {
+			wallRoutes = append(wallRoutes, r)
+		}
+
+	}
+	c.IndentedJSON(http.StatusOK, wallRoutes)
 }
