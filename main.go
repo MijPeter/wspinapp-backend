@@ -34,19 +34,23 @@ var walls = []wall{
 }
 
 var routes []route
+var basicAuth = gin.BasicAuth(gin.Accounts{
+	"wspinapp": "wspinapp",
+})
 
 func main() {
 	router := gin.Default()
+	router.Use(basicAuth)
 	router.GET("/walls", getWalls)
 	router.POST("/walls", addWall)
 	router.GET("/walls/:wallId", getWall)
 	router.GET("/walls/:wallId/routes", getRoutes)
 
-	router.Run("0.0.0.0:8080")
+	router.Run()
 }
 
 // TODO validation should be probably done some other way
-func validateAddWall(err error, newWall wall) *errors.HttpError {
+func validateAddWall(err error) *errors.HttpError {
 	if err != nil {
 		return errors.BadRequest
 	}
@@ -62,7 +66,7 @@ func addWall(c *gin.Context) {
 	var newWall wall
 
 	err := c.BindJSON(&newWall)
-	httpErr := validateAddWall(err, newWall)
+	httpErr := validateAddWall(err)
 
 	if httpErr != nil {
 		c.IndentedJSON(httpErr.Status(), httpErr.Error())
