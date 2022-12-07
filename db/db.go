@@ -9,7 +9,7 @@ import (
 var DB *sql.DB
 
 const (
-	host     = "localhost"
+	host     = "0.0.0.0"
 	dbPort   = 5432
 	user     = "wspinapp"
 	password = "sprayitwhileyoucanmyfriend"
