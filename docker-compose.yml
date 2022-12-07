@@ -2,6 +2,7 @@ version: '3.7'
 services:
   wspinapp_db:
     container_name: wspinapp_db
+    hostname: wspinapp_db
     image: postgres
     ports:
       - "54321:5432"
