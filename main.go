@@ -1,6 +1,7 @@
 package main
 
 import (
+	"example/wspinapp-backend/db"
 	"example/wspinapp-backend/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -39,6 +40,8 @@ var basicAuth = gin.BasicAuth(gin.Accounts{
 })
 
 func main() {
+	db.ConnectDb()
+
 	router := gin.Default()
 	router.Use(basicAuth)
 	router.GET("/walls", getWalls)
