@@ -10,7 +10,7 @@ var DB *sql.DB
 
 const (
 	host     = "localhost"
-	dbPort   = 54321
+	dbPort   = 5432
 	user     = "wspinapp"
 	password = "sprayitwhileyoucanmyfriend"
 	dbname   = "wspinapp"
