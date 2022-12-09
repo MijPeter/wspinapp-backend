@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /server
+RUN go build -o /server ./cmd
 
 # Run the binary program produced by `go install`
 CMD ["/server"]
