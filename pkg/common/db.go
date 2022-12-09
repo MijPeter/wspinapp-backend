@@ -1,14 +1,12 @@
-package db
+package common
 
 import (
-	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"time"
 )
-
-var DB *sql.DB
 
 const (
 	host     = "db"
@@ -18,35 +16,19 @@ const (
 	dbname   = "db"
 )
 
-func ConnectDb() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+func ConnectDb() *gorm.DB {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, dbPort, user, password, dbname)
-	var err error
 
 	for {
-		DB, err = sql.Open("postgres", psqlInfo)
-
-		if err != nil {
-			panic(err)
-		}
-
-		err = DB.Ping()
+		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
 			log.Println("Successfully connected to db.")
-			return
+			return db
 		} else {
 			time.Sleep(1 * time.Second)
 			log.Println("Couldn't connect to db, retrying in a moment")
 		}
 	}
-}
-
-func DisconnectDb() {
-	err := DB.Close()
-
-	if err != nil {
-		panic(err)
-	}
-
 }
