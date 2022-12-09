@@ -4,16 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"log"
+	"time"
 )
 
 var DB *sql.DB
 
 const (
-	host     = "wspinapp_db"
+	host     = "db"
 	dbPort   = 5432
 	user     = "wspinapp"
 	password = "sprayitwhileyoucanmyfriend"
-	dbname   = "wspinapp"
+	dbname   = "db"
 )
 
 func ConnectDb() {
@@ -21,16 +23,22 @@ func ConnectDb() {
 		"password=%s dbname=%s sslmode=disable",
 		host, dbPort, user, password, dbname)
 	var err error
-	DB, err = sql.Open("postgres", psqlInfo)
 
-	if err != nil {
-		panic(err)
-	}
+	for {
+		DB, err = sql.Open("postgres", psqlInfo)
 
-	err = DB.Ping()
-	if err != nil {
-		DB.Close()
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
+
+		err = DB.Ping()
+		if err == nil {
+			log.Println("Successfully connected to db.")
+			return
+		} else {
+			time.Sleep(1 * time.Second)
+			log.Println("Couldn't connect to db, retrying in a moment")
+		}
 	}
 }
 

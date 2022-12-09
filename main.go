@@ -48,7 +48,6 @@ func main() {
 	router.POST("/walls", addWall)
 	router.GET("/walls/:wallId", getWall)
 	router.GET("/walls/:wallId/routes", getRoutes)
-
 	router.Run()
 }
 
@@ -83,7 +82,6 @@ func addWall(c *gin.Context) {
 
 func getWall(c *gin.Context) {
 	wallId := c.Param("wallId")
-
 	for _, w := range walls {
 		if w.Id == wallId {
 			c.IndentedJSON(http.StatusOK, w)

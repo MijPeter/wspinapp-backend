@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o ./bin/wspinapp .
+RUN go build -o /server
 
 # Run the binary program produced by `go install`
-CMD ["./bin/wspinapp"]
+CMD ["/server"]
