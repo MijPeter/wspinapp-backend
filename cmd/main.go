@@ -12,6 +12,12 @@ var basicAuth = gin.BasicAuth(gin.Accounts{
 
 func main() {
 	db := common.ConnectDb()
+	db.AutoMigrate(
+		&common.Hold{},
+		&common.Wall{},
+		&common.Route{},
+	)
+
 	router := gin.Default()
 	router.Use(basicAuth)
 
