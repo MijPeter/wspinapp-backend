@@ -1,7 +1,6 @@
 package walls
 
 import (
-	"example/wspinapp-backend/pkg/common"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -21,9 +20,3 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	router.GET("/:wallId", h.GetWall)
 	router.GET("/:wallId/routes", h.GetRoutes)
 }
-
-// this should be db :)
-var walls = []common.Wall{
-	{Id: "0", Holds: []common.Hold{}, Image: "image_1.png"},
-}
-var routes []common.Route

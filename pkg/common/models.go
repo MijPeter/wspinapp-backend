@@ -1,23 +1,23 @@
 package common
 
-type Position struct {
+import (
+	"gorm.io/gorm"
+)
+
+type Hold struct {
+	gorm.Model
 	X int32 `json:"x"`
 	Y int32 `json:"y"`
 }
 
-type Hold struct {
-	Id       string   `json:"id"`
-	Position Position `json:"position"`
-}
-
 type Wall struct {
-	Id    string `json:"id"`
-	Holds []Hold `json:"holds"`
+	gorm.Model
+	Holds []Hold `json:"holds" gorm:"many2many:wall_holds;"`
 	Image string `json:"image"`
 }
 
 type Route struct {
-	Id     string `json:"id"`
-	Holds  []Hold `json:"holds"`
-	WallId string `json:"wall"` // probably should be wallId here instead
+	gorm.Model
+	Holds  []Hold `json:"holds" gorm:"many2many:route_holds;"`
+	WallID uint   `json:"wall"` // probably should be wallId here instead
 }

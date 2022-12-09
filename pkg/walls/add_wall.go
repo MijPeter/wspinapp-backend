@@ -5,7 +5,6 @@ import (
 	"example/wspinapp-backend/pkg/common/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 func validateAddWall(err error) *errors.HttpError {
@@ -26,8 +25,6 @@ func (h *handler) AddWall(c *gin.Context) {
 		c.IndentedJSON(httpErr.Status(), httpErr.Error())
 		return
 	}
-
-	newWall.Id = strconv.Itoa(len(walls))
-	walls = append(walls, newWall) // TODO use some kind of db or sth, maybe firestore for now and then as real db
+	h.DB.Create(&newWall)
 	c.IndentedJSON(http.StatusCreated, newWall)
 }
