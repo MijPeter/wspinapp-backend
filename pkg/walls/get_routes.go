@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (h *handler) GetRoutes(c *gin.Context) {
+func (h *wallRoutesHandler) GetRoutes(c *gin.Context) {
 	wallId64, err := strconv.ParseUint(c.Param("wallId"), 10, 32)
 	wallId := uint(wallId64)
 	if err != nil {
@@ -16,7 +16,7 @@ func (h *handler) GetRoutes(c *gin.Context) {
 	}
 
 	var wallRoutes []common.Route
-	h.DB.Where(common.Route{WallID: wallId}).Find(&wallRoutes)
+	h.database.Where(common.Route{WallID: wallId}).Find(&wallRoutes)
 
 	c.IndentedJSON(http.StatusOK, wallRoutes)
 }

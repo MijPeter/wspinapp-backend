@@ -15,7 +15,7 @@ func validateAddWall(err error) *errors.HttpError {
 	return nil
 }
 
-func (h *handler) AddWall(c *gin.Context) {
+func (h *wallRoutesHandler) AddWall(c *gin.Context) {
 	var newWall common.Wall
 
 	err := c.BindJSON(&newWall) // this should be some other structure than common.Wall
@@ -25,6 +25,6 @@ func (h *handler) AddWall(c *gin.Context) {
 		c.IndentedJSON(httpErr.Status(), httpErr.Error())
 		return
 	}
-	h.DB.Create(&newWall)
+	h.database.Create(&newWall)
 	c.IndentedJSON(http.StatusCreated, newWall)
 }

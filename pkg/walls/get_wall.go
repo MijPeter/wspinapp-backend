@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (h *handler) GetWall(c *gin.Context) {
+func (h *wallRoutesHandler) GetWall(c *gin.Context) {
 	wallId64, err := strconv.ParseUint(c.Param("wallId"), 10, 32)
 	wallId := uint(wallId64)
 
@@ -19,7 +19,7 @@ func (h *handler) GetWall(c *gin.Context) {
 	}
 	var wall common.Wall
 
-	err = h.DB.First(&wall, wallId).Error
+	err = h.database.First(&wall, wallId).Error
 
 	if err != nil {
 		httpErr := errors.NotFound

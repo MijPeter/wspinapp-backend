@@ -5,13 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type handler struct {
-	DB *gorm.DB
+type wallRoutesHandler struct {
+	database *gorm.DB
 }
 
 func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
-	h := &handler{
-		DB: db,
+	h := &wallRoutesHandler{
+		database: db,
 	}
 	router := r.Group("/walls")
 
