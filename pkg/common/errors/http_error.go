@@ -34,3 +34,8 @@ var NotFound = &HttpError{
 var Conflict = &HttpError{
 	http.StatusConflict,
 	errors.New("resource already exists")}
+
+var InternalError = &HttpError{
+	http.StatusInternalServerError,
+	errors.New("error carrying out action"),
+}
