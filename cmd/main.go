@@ -13,8 +13,6 @@ var basicAuth = gin.BasicAuth(gin.Accounts{
 })
 
 func main() {
-	common.LoadEnvironmentVariables()
-
 	db := common.ConnectDb()
 	db.AutoMigrate(
 		&common.Hold{},

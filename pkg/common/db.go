@@ -8,18 +8,10 @@ import (
 	"time"
 )
 
-const (
-	host     = "db"
-	dbPort   = 5432
-	user     = "wspinapp"
-	password = "sprayitwhileyoucanmyfriend"
-	dbname   = "db"
-)
-
 func ConnectDb() *gorm.DB {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		host, dbPort, user, password, dbname)
+		EnvDBHost(), EnvDBPort(), EnvDBUser(), EnvDBPassword(), EnvDBName())
 
 	for {
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

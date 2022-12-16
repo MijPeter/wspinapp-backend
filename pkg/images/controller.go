@@ -22,7 +22,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, imageRepository imgrepository.Im
 	router := r.Group("/images")
 
 	router.POST("/", routeHandler.UploadImage)
-	router.GET("/", routeHandler.DownloadImage)
+	//router.GET("/", routeHandler.DownloadImage) - todo this should return and image for a given wall -> probably to be done in walls
 }
 
 // do as described here :))
