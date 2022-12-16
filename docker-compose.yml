@@ -4,10 +4,11 @@ services:
     container_name: db
     image: postgres
     restart: unless-stopped
-    environment:
-      - POSTGRES_PASSWORD=sprayitwhileyoucanmyfriend
-      - POSTGRES_USER=wspinapp
-      - POSTGRES_DB=db
+    env_file:
+      - '.wspinapp.env'
+#      - POSTGRES_PASSWORD=sprayitwhileyoucanmyfriend
+#      - POSTGRES_USER=wspinapp
+#      - POSTGRES_DB=db
   server:
     container_name: server
     restart: "no"
@@ -17,4 +18,4 @@ services:
     depends_on:
       - db
     env_file:
-      ~/wspinapp.env
+      - '.wspinapp.env'
