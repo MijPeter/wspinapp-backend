@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h *wallRoutesHandler) GetWalls(c *gin.Context) {
+func (h *routesHandler) GetWalls(c *gin.Context) {
 	var walls []common.Wall
 	h.database.Find(&walls)
 	c.IndentedJSON(http.StatusOK, walls)

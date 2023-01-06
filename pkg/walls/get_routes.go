@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (h *wallRoutesHandler) GetRoutes(c *gin.Context) {
+func (h *routesHandler) GetRoutes(c *gin.Context) {
 	wallId64, err := strconv.ParseUint(c.Param("wallId"), 10, 32)
 	wallId := uint(wallId64)
 	if err != nil {
