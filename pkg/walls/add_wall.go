@@ -15,7 +15,7 @@ func validateAddWall(err error) *errors.HttpError {
 	return nil
 }
 
-func (h *wallRoutesHandler) AddWall(c *gin.Context) {
+func (h *routesHandler) AddWall(c *gin.Context) {
 	var newWall common.Wall
 
 	err := c.BindJSON(&newWall) // this should be some other structure than common.Wall
