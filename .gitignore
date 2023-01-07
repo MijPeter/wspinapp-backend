@@ -16,3 +16,6 @@
 
 # Environment variables
 .wspinapp.env
+
+# Fuck idea files
+.idea/*
