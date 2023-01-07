@@ -3,8 +3,7 @@ package main
 import (
 	"example/wspinapp-backend/pkg/common"
 	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
-	"example/wspinapp-backend/pkg/images"
-	"example/wspinapp-backend/pkg/walls"
+	"example/wspinapp-backend/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +21,9 @@ func main() {
 	// todo probably create some simple adapter for db for cleanliness sake
 
 	router := gin.Default()
-	router.Use(basicAuth)
+	router.Use(basicAuth)               // TODO add google account auth
+	router.MaxMultipartMemory = 8 << 20 // 8MiB
 
-	walls.RegisterRoutes(router, db)
-	images.RegisterRoutes(router, db, imgrepository.New())
+	controller.RegisterRoutes(router, db, imgrepository.New())
 	router.Run()
 }

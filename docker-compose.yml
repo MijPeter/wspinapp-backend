@@ -6,9 +6,6 @@ services:
     restart: unless-stopped
     env_file:
       - '.wspinapp.env'
-#      - POSTGRES_PASSWORD=sprayitwhileyoucanmyfriend
-#      - POSTGRES_USER=wspinapp
-#      - POSTGRES_DB=db
   server:
     container_name: server
     restart: "no"

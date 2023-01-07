@@ -1,4 +1,4 @@
-package walls
+package controller
 
 import (
 	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
@@ -21,8 +21,8 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, imageRepository imgrepository.Im
 	}
 	router := r.Group("/walls")
 
-	router.POST("/", h.AddWall)
-	router.GET("/", h.GetWalls)
+	router.POST("", h.AddWall)
+	router.GET("", h.GetWalls)
 	router.GET("/:wallId", h.GetWall)
 	router.GET("/:wallId/routes", h.GetRoutes)
 	router.PATCH("/:wallId/image", h.UploadImage)
