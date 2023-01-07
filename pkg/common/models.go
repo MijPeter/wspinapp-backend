@@ -7,24 +7,29 @@ import (
 
 type Hold struct {
 	gorm.Model
-	X int32 `json:"x"`
-	Y int32 `json:"y"`
+	X      int32 `json:"X"`
+	Y      int32 `json:"Y"`
+	WallID uint  `json:"WallID"`
 }
 
 type Wall struct {
 	gorm.Model
-	Holds []Hold `json:"holds" gorm:"many2many:wall_holds;"`
-	Image string `json:"image"`
+	Holds []Hold `json:"Holds"`
+	Image string `json:"Image"`
 }
 
 type Route struct {
 	gorm.Model
-	Holds  []Hold `json:"holds" gorm:"many2many:route_holds;"`
-	WallID uint   `json:"wall"` // probably should be wallId here instead
+	Holds  []Hold `json:"Holds" gorm:"many2many:route_holds;"`
+	WallID uint   `json:"WallId"`
 }
 
 type File struct {
 	File multipart.File `json:"file,omitempty" validate:"required"`
+}
+
+type Form struct {
+	File *multipart.FileHeader `form:"file" binding:"required"`
 }
 
 type Url struct {
