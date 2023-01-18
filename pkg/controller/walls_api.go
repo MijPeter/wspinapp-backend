@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"example/wspinapp-backend/pkg/common"
 	"example/wspinapp-backend/pkg/common/errors"
+	"example/wspinapp-backend/pkg/common/schema"
 	"example/wspinapp-backend/pkg/services/walls_service"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -11,7 +11,7 @@ import (
 )
 
 func (h *routesHandler) AddWall(c *gin.Context) {
-	var newWall common.Wall
+	var newWall schema.Wall
 
 	err := c.BindJSON(&newWall)
 
@@ -24,7 +24,7 @@ func (h *routesHandler) AddWall(c *gin.Context) {
 }
 
 func (h *routesHandler) GetWall(c *gin.Context) {
-	wallId64, err := strconv.ParseUint(c.Param("wallId"), 10, 32)
+	wallId64, err := parseUint(c.Param("wallId"))
 	wallId := uint(wallId64)
 
 	if err != nil {
@@ -48,18 +48,19 @@ func (h *routesHandler) GetWalls(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, walls)
 }
 
-func (h *routesHandler) GetRoutes(c *gin.Context) {
-	wallId64, err := parseUint(c.Param("wallId"))
-	wallId := uint(wallId64)
-	if err != nil {
-		returnErrorResponse(c, errors.BadRequest)
-		return
-	}
-
-	wallRoutes := walls_service.GetRoutes(h.database, wallId)
-
-	c.IndentedJSON(http.StatusOK, wallRoutes)
-}
+// TODO ROUTES aren't implemented yet
+//func (h *routesHandler) GetRoutes(c *gin.Context) {
+//	wallId64, err := parseUint(c.Param("wallId"))
+//	wallId := uint(wallId64)
+//	if err != nil {
+//		returnErrorResponse(c, errors.BadRequest)
+//		return
+//	}
+//
+//	wallRoutes := walls_service.GetRoutes(h.database, wallId)
+//
+//	c.IndentedJSON(http.StatusOK, wallRoutes)
+//}
 
 func (h *routesHandler) UploadImage(c *gin.Context) {
 	uploadedFile, _, err := c.Request.FormFile("file")
@@ -88,7 +89,7 @@ func (h *routesHandler) UploadImage(c *gin.Context) {
 		h.database,
 		h.imageRepository,
 		wallId,
-		common.File{File: uploadedFile})
+		schema.File{File: uploadedFile})
 
 	if err != nil {
 		log.Printf("Failed to upload image, %s\n", err.Error())
@@ -108,5 +109,3 @@ func returnErrorResponse(c *gin.Context, httpError *errors.HttpError) {
 func parseUint(id string) (uint64, error) {
 	return strconv.ParseUint(id, 10, 32)
 }
-
-//https://dev.to/hackmamba/robust-media-upload-with-golang-and-cloudinary-gin-gonic-version-54ii

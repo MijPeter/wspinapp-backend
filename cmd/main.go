@@ -3,6 +3,7 @@ package main
 import (
 	"example/wspinapp-backend/pkg/common"
 	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
+	"example/wspinapp-backend/pkg/common/schema"
 	"example/wspinapp-backend/pkg/controller"
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +15,9 @@ var basicAuth = gin.BasicAuth(gin.Accounts{
 func main() {
 	db := common.ConnectDb()
 	db.AutoMigrate(
-		&common.Hold{},
-		&common.Wall{},
-		&common.Route{},
+		&schema.Wall{},
+		//&schema.Route{}, TODO routes not implemented yet
+		&schema.Hold{},
 	)
 	// todo probably create some simple adapter for db for cleanliness sake
 

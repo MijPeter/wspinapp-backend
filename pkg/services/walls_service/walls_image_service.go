@@ -1,8 +1,8 @@
 package walls_service
 
 import (
-	"example/wspinapp-backend/pkg/common"
 	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
+	"example/wspinapp-backend/pkg/common/schema"
 	"gorm.io/gorm"
 	"log"
 )
@@ -11,7 +11,7 @@ func UploadFileAndSaveUrlToDb(
 	db *gorm.DB,
 	imageRepository imgrepository.ImageRepository,
 	wallId uint,
-	file common.File) (string, error) {
+	file schema.File) (string, error) {
 
 	uploadUrl, err := FileUpload(file, imageRepository)
 
@@ -26,8 +26,7 @@ func UploadFileAndSaveUrlToDb(
 }
 
 func uploadUrlToDb(wallId uint, url string, db *gorm.DB) error {
-
-	var wall common.Wall
+	var wall schema.Wall
 
 	err := db.First(&wall, wallId).Error
 
@@ -35,11 +34,11 @@ func uploadUrlToDb(wallId uint, url string, db *gorm.DB) error {
 		return err
 	}
 
-	wall.Image = url
+	wall.ImageUrl = url
 	return db.Save(&wall).Error
 }
 
-func FileUpload(file common.File, imageRepository imgrepository.ImageRepository) (string, error) {
+func FileUpload(file schema.File, imageRepository imgrepository.ImageRepository) (string, error) {
 	//upload
 	uploadUrl, err := imageRepository.Upload(file.File)
 	if err != nil {
