@@ -16,7 +16,7 @@ func main() {
 	db := common.ConnectDb()
 	db.AutoMigrate(
 		&schema.Wall{},
-		//&schema.Route{}, TODO routes not implemented yet
+		&schema.Route{},
 		&schema.Hold{},
 	)
 	// todo probably create some simple adapter for db for cleanliness sake
