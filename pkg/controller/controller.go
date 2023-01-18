@@ -24,6 +24,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, imageRepository imgrepository.Im
 	router.POST("", h.AddWall)
 	router.GET("", h.GetWalls)
 	router.GET("/:wallId", h.GetWall)
-	router.GET("/:wallId/routes", h.GetRoutes)
+	//router.GET("/:wallId/routes", h.GetRoutes) // TODO routes aren't implemented yet
 	router.PATCH("/:wallId/image", h.UploadImage)
 }
