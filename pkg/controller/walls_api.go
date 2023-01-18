@@ -62,6 +62,31 @@ func (h *routesHandler) GetWalls(c *gin.Context) {
 //	c.IndentedJSON(http.StatusOK, wallRoutes)
 //}
 
+func (h *routesHandler) AddRoute(c *gin.Context) {
+	wallId64, err := parseUint(c.Param("wallId"))
+	wallId := uint(wallId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	var newRoute schema.Route
+	err = c.BindJSON(&newRoute)
+
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	err = walls_service.AddRoute(h.database, &newRoute, wallId)
+	if err != nil {
+		log.Printf(err.Error())
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, newRoute)
+}
+
 func (h *routesHandler) UploadImage(c *gin.Context) {
 	uploadedFile, _, err := c.Request.FormFile("file")
 	if err != nil {
