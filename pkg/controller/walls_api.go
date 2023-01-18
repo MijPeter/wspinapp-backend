@@ -48,18 +48,19 @@ func (h *routesHandler) GetWalls(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, walls)
 }
 
-func (h *routesHandler) GetRoutes(c *gin.Context) {
-	wallId64, err := parseUint(c.Param("wallId"))
-	wallId := uint(wallId64)
-	if err != nil {
-		returnErrorResponse(c, errors.BadRequest)
-		return
-	}
-
-	wallRoutes := walls_service.GetRoutes(h.database, wallId)
-
-	c.IndentedJSON(http.StatusOK, wallRoutes)
-}
+// TODO ROUTES aren't implemented yet
+//func (h *routesHandler) GetRoutes(c *gin.Context) {
+//	wallId64, err := parseUint(c.Param("wallId"))
+//	wallId := uint(wallId64)
+//	if err != nil {
+//		returnErrorResponse(c, errors.BadRequest)
+//		return
+//	}
+//
+//	wallRoutes := walls_service.GetRoutes(h.database, wallId)
+//
+//	c.IndentedJSON(http.StatusOK, wallRoutes)
+//}
 
 func (h *routesHandler) AddRoute(c *gin.Context) {
 	wallId64, err := parseUint(c.Param("wallId"))
