@@ -69,9 +69,9 @@ func AddRoute(db *gorm.DB, route *schema.Route, wallId uint) error {
 		}
 	}
 
-	if len(route.TopHold) > 0 {
+	if len(route.TopHold) > 1 {
 		return errors.New("Too many top holds", 400)
-	} else if len(route.TopHold) == 0 {
+	} else if len(route.TopHold) == 1 {
 		realHold, ok := holdsMap[route.TopHold[0].ID]
 		if !ok {
 			return errors.New("Hold doesn't belong to wall", 400)
