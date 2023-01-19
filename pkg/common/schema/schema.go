@@ -25,8 +25,8 @@ type Route struct {
 	gorm.Model
 	Holds      []Hold `json:"Holds" gorm:"many2many:route_holds"`
 	StartHolds []Hold `json:"StartHolds" gorm:"many2many:route_holds"`
-	//TopHold    Hold   `json:"TopHold" gorm:"many2many:route_holds"`
-	WallID uint `json:"WallId" gorm:"not_null"`
+	TopHold    []Hold `json:"TopHold" gorm:"many2many:route_holds"`
+	WallID     uint   `json:"WallId" gorm:"not_null"`
 }
 
 type File struct {
