@@ -16,7 +16,7 @@ func (h *routesHandler) AddWall(c *gin.Context) {
 	err := c.BindJSON(&newWall)
 
 	if err != nil {
-		returnErrorResponse(c, errors.BadRequest)
+		returnErrorResponseDebug(c, errors.BadRequest, err)
 		return
 	}
 	walls_service.AddWall(h.database, &newWall)
@@ -90,8 +90,8 @@ func (h *routesHandler) AddRoute(c *gin.Context) {
 func (h *routesHandler) UploadImage(c *gin.Context) {
 	uploadedFile, _, err := c.Request.FormFile("file")
 	if err != nil {
-		log.Printf("Failed to parse given image, %s\n", err.Error())
 		returnErrorResponse(c, errors.BadRequest)
+		returnErrorResponseDebug(c, errors.BadRequest, err)
 		return
 	}
 
@@ -117,12 +117,16 @@ func (h *routesHandler) UploadImage(c *gin.Context) {
 		schema.File{File: uploadedFile})
 
 	if err != nil {
-		log.Printf("Failed to upload image, %s\n", err.Error())
-		returnErrorResponse(c, errors.InternalError)
+		returnErrorResponseDebug(c, errors.InternalError, err)
 		return
 	}
 
 	c.IndentedJSON(http.StatusCreated, uploadUrl)
+}
+
+func returnErrorResponseDebug(c *gin.Context, httpError *errors.HttpError, err error) {
+	log.Printf("Failed to perform an action, %s\n", err.Error())
+	returnErrorResponse(c, httpError)
 }
 
 func returnErrorResponse(c *gin.Context, httpError *errors.HttpError) {
