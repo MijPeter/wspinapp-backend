@@ -3,7 +3,6 @@ package controller
 import (
 	"example/wspinapp-backend/pkg/common/errors"
 	"example/wspinapp-backend/pkg/common/schema"
-	"example/wspinapp-backend/pkg/services/walls_service"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -19,7 +18,7 @@ func (h *routesHandler) AddWall(c *gin.Context) {
 		returnErrorResponseDebug(c, errors.BadRequest, err)
 		return
 	}
-	walls_service.AddWall(h.database, &newWall)
+	h.service.WallsService.AddWall(&newWall)
 	c.IndentedJSON(http.StatusCreated, newWall)
 }
 
@@ -32,7 +31,7 @@ func (h *routesHandler) GetWall(c *gin.Context) {
 		return
 	}
 
-	wall, err := walls_service.GetWall(h.database, wallId)
+	wall, err := h.service.WallsService.GetWall(wallId)
 
 	if err != nil {
 		returnErrorResponse(c, errors.NotFound)
@@ -43,12 +42,51 @@ func (h *routesHandler) GetWall(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, wall)
 }
 
+func (h *routesHandler) UpdateWall(c *gin.Context) {
+	wallId64, err := parseUint(c.Param("wallId"))
+	wallId := uint(wallId64)
+
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	var wall schema.Wall
+
+	err = c.BindJSON(&wall)
+
+	if err != nil {
+		returnErrorResponseDebug(c, errors.BadRequest, err)
+		return
+	}
+
+	stateWall, err := h.service.WallsService.UpdateWall(wallId, &wall)
+
+	if err != nil {
+		returnErrorResponseDebug(c, errors.BadRequest, err)
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, stateWall)
+}
+
+func (h *routesHandler) DeleteWall(c *gin.Context) {
+	wallId64, err := parseUint(c.Param("wallId"))
+	wallId := uint(wallId64)
+
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	h.service.WallsService.DeleteWall(wallId)
+}
+
 func (h *routesHandler) GetWalls(c *gin.Context) {
-	walls := walls_service.GetWalls(h.database)
+	walls := h.service.WallsService.GetWalls()
 	c.IndentedJSON(http.StatusOK, walls)
 }
 
-// TODO ROUTES aren't implemented yet
 func (h *routesHandler) GetRoutes(c *gin.Context) {
 	wallId64, err := parseUint(c.Param("wallId"))
 	wallId := uint(wallId64)
@@ -57,7 +95,7 @@ func (h *routesHandler) GetRoutes(c *gin.Context) {
 		return
 	}
 
-	wallRoutes := walls_service.GetRoutes(h.database, wallId)
+	wallRoutes := h.service.WallsService.GetRoutes(wallId)
 
 	c.IndentedJSON(http.StatusOK, wallRoutes)
 }
@@ -78,7 +116,7 @@ func (h *routesHandler) AddRoute(c *gin.Context) {
 		return
 	}
 
-	err = walls_service.AddRoute(h.database, &newRoute, wallId)
+	err = h.service.WallsService.AddRoute(&newRoute, wallId)
 	if err != nil {
 		log.Printf(err.Error())
 		returnErrorResponse(c, errors.BadRequest)
@@ -87,7 +125,94 @@ func (h *routesHandler) AddRoute(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newRoute)
 }
 
-func (h *routesHandler) UploadImage(c *gin.Context) {
+func (h *routesHandler) GetRoute(c *gin.Context) {
+	wallId64, err := parseUint(c.Param("wallId"))
+	wallId := uint(wallId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	routeId64, err := parseUint(c.Param("routeId"))
+	routeId := uint(routeId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	route, err := h.service.WallsService.GetRoute(wallId, routeId)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, route)
+}
+
+func (h *routesHandler) UpdateRoute(c *gin.Context) {
+	wallId64, err := parseUint(c.Param("wallId"))
+	wallId := uint(wallId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	routeId64, err := parseUint(c.Param("routeId"))
+	routeId := uint(routeId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	var newRoute schema.Route
+	err = c.BindJSON(&newRoute)
+
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	err = h.service.WallsService.UpdateRoute(&newRoute, wallId, routeId)
+	if err != nil {
+		log.Printf(err.Error())
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, newRoute)
+}
+
+func (h *routesHandler) DeleteRoute(c *gin.Context) {
+	wallId64, err := parseUint(c.Param("wallId"))
+	wallId := uint(wallId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	routeId64, err := parseUint(c.Param("routeId"))
+	routeId := uint(routeId64)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+
+	err = h.service.WallsService.DeleteRoute(wallId, routeId)
+	if err != nil {
+		log.Printf(err.Error())
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+	c.IndentedJSON(http.StatusNoContent, "")
+}
+
+func (h *routesHandler) UploadImageFull(c *gin.Context) {
+	h.UploadImage(c, false)
+}
+
+func (h *routesHandler) UploadImagePreview(c *gin.Context) {
+	h.UploadImage(c, true)
+}
+
+func (h *routesHandler) UploadImage(c *gin.Context, isPreview bool) {
 	uploadedFile, _, err := c.Request.FormFile("file")
 	if err != nil {
 		returnErrorResponse(c, errors.BadRequest)
@@ -110,11 +235,10 @@ func (h *routesHandler) UploadImage(c *gin.Context) {
 		return
 	}
 
-	uploadUrl, err := walls_service.UploadFileAndSaveUrlToDb(
-		h.database,
-		h.imageRepository,
+	uploadUrl, err := h.service.WallsService.UploadFileAndSaveUrlToDb(
 		wallId,
-		schema.File{File: uploadedFile})
+		schema.File{File: uploadedFile},
+		isPreview)
 
 	if err != nil {
 		returnErrorResponseDebug(c, errors.InternalError, err)

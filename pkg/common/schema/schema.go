@@ -17,8 +17,9 @@ type Hold struct {
 
 type Wall struct {
 	gorm.Model
-	Holds    []Hold `json:"Holds"`
-	ImageUrl string `json:"ImageUrl"`
+	Holds           []Hold `json:"Holds"`
+	ImageUrl        string `json:"ImageUrl"`
+	ImagePreviewUrl string `json:"ImagePreviewUrl"`
 }
 
 type Route struct {

@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  test_db:
+    container_name: test_db
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: test_db
+    ports:
+      - "5432:5432"
+#  tests:
+#    container_name: tests
+#    restart: "no"
+#    build:
+#      context: .
+#      target: test
+#    depends_on:
+#      - test_db

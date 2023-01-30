@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 services:
   db:
     container_name: db
@@ -9,7 +9,9 @@ services:
   server:
     container_name: server
     restart: "no"
-    build: .
+    build:
+      context: .
+      target: app
     ports:
       - "8080:8080"
     depends_on:

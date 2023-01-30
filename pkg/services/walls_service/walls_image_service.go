@@ -1,46 +1,47 @@
 package walls_service
 
 import (
-	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
 	"example/wspinapp-backend/pkg/common/schema"
-	"gorm.io/gorm"
 	"log"
 )
 
-func UploadFileAndSaveUrlToDb(
-	db *gorm.DB,
-	imageRepository imgrepository.ImageRepository,
+func (s *WallsService) UploadFileAndSaveUrlToDb(
 	wallId uint,
-	file schema.File) (string, error) {
+	file schema.File,
+	isPreview bool) (string, error) {
 
-	uploadUrl, err := FileUpload(file, imageRepository)
+	uploadUrl, err := s.fileUpload(file)
 
 	if err != nil {
 		log.Printf("Failed to upload image, %s\n", err.Error())
 		return "", err
 	}
 
-	err = uploadUrlToDb(wallId, uploadUrl, db)
+	err = s.uploadUrlToDb(wallId, uploadUrl, isPreview)
 
 	return uploadUrl, err
 }
 
-func uploadUrlToDb(wallId uint, url string, db *gorm.DB) error {
+func (s *WallsService) uploadUrlToDb(wallId uint, url string, isPreview bool) error {
 	var wall schema.Wall
 
-	err := db.First(&wall, wallId).Error
+	err := s.database.First(&wall, wallId).Error
 
 	if err != nil {
 		return err
 	}
 
-	wall.ImageUrl = url
-	return db.Save(&wall).Error
+	if isPreview {
+		wall.ImagePreviewUrl = url
+	} else {
+		wall.ImageUrl = url
+	}
+	return s.database.Save(&wall).Error
 }
 
-func FileUpload(file schema.File, imageRepository imgrepository.ImageRepository) (string, error) {
+func (s *WallsService) fileUpload(file schema.File) (string, error) {
 	//upload
-	uploadUrl, err := imageRepository.Upload(file.File)
+	uploadUrl, err := s.imageRepository.Upload(file.File)
 	if err != nil {
 		return "", err
 	}

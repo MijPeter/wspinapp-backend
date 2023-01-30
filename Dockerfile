@@ -1,4 +1,4 @@
-FROM golang:1.19.3
+FROM golang:1.19.3 as base
 
 # Set the Current Working Directory inside the container
 WORKDIR /wspinapp
@@ -11,8 +11,8 @@ RUN go mod download
 
 COPY . .
 
+FROM base as app
 # Build the Go app
 RUN go build -o /server ./cmd
-
 # Run the binary program produced by `go install`
 CMD ["/server"]
