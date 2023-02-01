@@ -11,6 +11,10 @@ RUN go mod download
 
 COPY . .
 
+FROM base as test
+CMD go test tests/highlevel_test.go -v
+
+
 FROM base as app
 # Build the Go app
 RUN go build -o /server ./cmd

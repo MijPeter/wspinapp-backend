@@ -10,11 +10,13 @@ services:
       POSTGRES_DB: test_db
     ports:
       - "5432:5432"
-#  tests:
-#    container_name: tests
-#    restart: "no"
-#    build:
-#      context: .
-#      target: test
-#    depends_on:
-#      - test_db
+  tests:
+    container_name: tests
+    restart: "no"
+    build:
+      context: .
+      target: test
+    depends_on:
+      - test_db
+    environment:
+      - POSTGRES_HOST=test_db

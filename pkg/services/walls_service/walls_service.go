@@ -19,6 +19,15 @@ func New(db *gorm.DB, imageRepository imgrepository.ImageRepository) WallsServic
 }
 
 func (s *WallsService) AddWall(wall *schema.Wall) {
+	wall.Model = gorm.Model{}
+
+	for i := range wall.Holds {
+		wall.Holds[i].Model = gorm.Model{}
+	}
+
+	wall.ImageUrl = ""
+	wall.ImagePreviewUrl = ""
+
 	s.database.Create(wall)
 }
 
@@ -43,10 +52,37 @@ func (s *WallsService) UpdateWall(wallId uint, wall *schema.Wall) (schema.Wall, 
 
 	// delete holds that are being removed ass well TODO
 
-	// updating fields
-	stateWall.Holds = wall.Holds
-	err = s.database.Preload(clause.Associations).Save(stateWall).Error
+	currentHolds := make(map[uint]schema.Hold)
 
+	for _, hold := range stateWall.Holds {
+		currentHolds[hold.ID] = hold
+	}
+
+	for i, newHold := range wall.Holds {
+		realHold, ok := currentHolds[newHold.ID]
+
+		log.Println("REAL HOLD IS")
+		log.Printf("%+v\n", realHold)
+
+		newHold.WallID = wallId
+		if !ok {
+			newHold.Model = gorm.Model{}
+			log.Println(newHold.WallID)
+			err = s.database.Create(newHold).Error
+			log.Println("Created hold:")
+			log.Printf("%+v\n", newHold)
+		} else {
+			newHold.WallID = realHold.WallID
+			err = s.database.Updates(&newHold).Error
+			log.Println(wall.Holds[i])
+		}
+		if err != nil {
+			return *wall, err
+		}
+
+	}
+
+	err = s.database.Preload(clause.Associations).First(&stateWall, wallId).Error
 	return stateWall, err
 }
 
