@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+# TODO make this script to work with man
+# TODO create a flag --generate-goldens that makes it so that instead of failing when goldens don't match -> generate them again
+
 if [ "$1" == "--test" ]; then
   docker compose -f docker-compose.test.yml up --build --remove-orphans --abort-on-container-exit
 elif [ "$1" == "--fast" ]; then

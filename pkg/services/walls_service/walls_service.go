@@ -46,10 +46,6 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 		return stateWall, err
 	}
 
-	// delete all routes for a newWall
-	s.database.Delete(&schema.Route{}, "wall_id = ?", wallId)
-	// TODO delete only those routes that have their holds removed
-
 	// delete holds that are being removed ass well TODO
 
 	currentHolds := make(map[uint]schema.Hold)
@@ -85,11 +81,16 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 		newHolds[hold.ID] = hold
 	}
 
+	var deletedHolds []schema.Hold
+
 	for i := range stateWall.Holds {
 		stateHold := stateWall.Holds[i]
 		_, ok := newHolds[stateHold.ID]
 		if !ok {
+			// TODO delete routes that have this hold
+
 			err = s.database.Delete(&stateHold, "id = ?", stateHold.ID).Error
+			deletedHolds = append(deletedHolds, stateHold)
 			log.Printf("Deleting hold with id :%d", stateHold.ID)
 			if err != nil {
 				return *newWall, err
