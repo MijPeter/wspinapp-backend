@@ -2,49 +2,33 @@ package test_utils
 
 import (
 	"example/wspinapp-backend/pkg/common/schema"
-	"gorm.io/gorm"
 	"time"
 )
 
 var Now = time.Date(2023, 1, 1, 10, 0, 0, 0, time.Local)
 
-var Wall = schema.Wall{
-	Model: gorm.Model{
-		ID:        1,
-		CreatedAt: Now,
-		UpdatedAt: Now},
+var WallMinimal = schema.Wall{}
+
+var WallWithHolds = schema.Wall{
 	Holds: []schema.Hold{{
-		Model: gorm.Model{
-			ID:        1,
-			CreatedAt: Now,
-			UpdatedAt: Now},
-		WallID: 1,
-		X:      120.03,
-		Y:      256.43,
-		Shape:  "Circle",
+		X:     120.03,
+		Y:     256.43,
+		Shape: "Circle",
 	}, {
-		Model: gorm.Model{
-			ID:        2,
-			CreatedAt: Now,
-			UpdatedAt: Now},
-		WallID: 1,
-		X:      120.03,
-		Y:      36.43,
+		X: 120.03,
+		Y: 36.43,
 	}},
-	ImageUrl:        "",
-	ImagePreviewUrl: "",
 }
 
-var Wall2 = schema.Wall{
-	Model: gorm.Model{
-		ID:        2,
-		CreatedAt: Now,
-		UpdatedAt: Now},
+var WallFull = schema.Wall{
 	Holds: []schema.Hold{{
-		Model: gorm.Model{
-			ID:        3,
-			CreatedAt: Now,
-			UpdatedAt: Now},
-		WallID: 2,
+		X:     666.03,
+		Y:     21.37,
+		Shape: "Circle",
+	}, {
+		X: 120.03,
+		Y: 36.43,
 	}},
+	ImageUrl:        "abcde",
+	ImagePreviewUrl: "fghij",
 }

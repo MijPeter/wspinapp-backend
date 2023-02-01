@@ -1,34 +1,34 @@
 {
-    "ID": 4,
+    "ID": 5,
     "CreatedAt": "2023-01-01T10:00:00+01:00",
     "UpdatedAt": "2023-01-01T10:00:00+01:00",
     "DeletedAt": null,
     "Holds": [
         {
-            "ID": 7,
+            "ID": 9,
             "CreatedAt": "2023-01-01T10:00:00+01:00",
             "UpdatedAt": "2023-01-01T10:00:00+01:00",
             "DeletedAt": null,
-            "X": 120.03,
-            "Y": 256.43,
+            "X": 300,
+            "Y": 250.43,
             "Size": 0,
-            "WallID": 4,
+            "WallID": 5,
             "Shape": "Circle",
             "Angle": 0
         },
         {
-            "ID": 8,
+            "ID": 11,
             "CreatedAt": "2023-01-01T10:00:00+01:00",
             "UpdatedAt": "2023-01-01T10:00:00+01:00",
             "DeletedAt": null,
-            "X": 120.03,
+            "X": 777.03,
             "Y": 36.43,
             "Size": 0,
-            "WallID": 4,
+            "WallID": 5,
             "Shape": "circle",
             "Angle": 0
         }
     ],
-    "ImageUrl": "",
-    "ImagePreviewUrl": ""
+    "ImageUrl": "abcde",
+    "ImagePreviewUrl": "fghij"
 }
