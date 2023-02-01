@@ -19,6 +19,15 @@ func New(db *gorm.DB, imageRepository imgrepository.ImageRepository) WallsServic
 }
 
 func (s *WallsService) AddWall(wall *schema.Wall) {
+	wall.Model = gorm.Model{}
+
+	for i := range wall.Holds {
+		wall.Holds[i].Model = gorm.Model{}
+	}
+
+	wall.ImageUrl = ""
+	wall.ImagePreviewUrl = ""
+
 	s.database.Create(wall)
 }
 
@@ -29,7 +38,7 @@ func (s *WallsService) GetWall(wallId uint) (schema.Wall, error) {
 	return wall, err
 }
 
-func (s *WallsService) UpdateWall(wallId uint, wall *schema.Wall) (schema.Wall, error) {
+func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wall, error) {
 	var stateWall schema.Wall
 
 	err := s.database.Preload(clause.Associations).First(&stateWall, wallId).Error
@@ -37,16 +46,59 @@ func (s *WallsService) UpdateWall(wallId uint, wall *schema.Wall) (schema.Wall, 
 		return stateWall, err
 	}
 
-	// delete all routes for a wall
+	// delete all routes for a newWall
 	s.database.Delete(&schema.Route{}, "wall_id = ?", wallId)
 	// TODO delete only those routes that have their holds removed
 
 	// delete holds that are being removed ass well TODO
 
-	// updating fields
-	stateWall.Holds = wall.Holds
-	err = s.database.Preload(clause.Associations).Save(stateWall).Error
+	currentHolds := make(map[uint]schema.Hold)
 
+	for i := range stateWall.Holds {
+		hold := stateWall.Holds[i]
+		currentHolds[hold.ID] = hold
+	}
+
+	var newStateHolds []schema.Hold
+	for i := range newWall.Holds {
+		newHold := newWall.Holds[i]
+		stateHold, ok := currentHolds[newHold.ID]
+
+		newHold.WallID = wallId
+		if !ok {
+			newHold.Model = gorm.Model{}
+			newStateHolds = append(newStateHolds, newHold)
+		} else {
+			copyHoldInto(newHold, &stateHold)
+			err = s.database.Updates(&stateHold).Error
+			newStateHolds = append(newStateHolds, stateHold)
+		}
+		if err != nil {
+			return *newWall, err
+		}
+	}
+
+	// Delete holds that aren't present in newHolds
+	newHolds := make(map[uint]schema.Hold)
+	for i := range newWall.Holds {
+		hold := newWall.Holds[i]
+		newHolds[hold.ID] = hold
+	}
+
+	for i := range stateWall.Holds {
+		stateHold := stateWall.Holds[i]
+		_, ok := newHolds[stateHold.ID]
+		if !ok {
+			err = s.database.Delete(&stateHold, "id = ?", stateHold.ID).Error
+			log.Printf("Deleting hold with id :%d", stateHold.ID)
+			if err != nil {
+				return *newWall, err
+			}
+		}
+	}
+
+	stateWall.Holds = newStateHolds
+	err = s.database.Save(&stateWall).Error
 	return stateWall, err
 }
 
@@ -214,4 +266,12 @@ func (s *WallsService) DeleteRoute(wallId uint, routeId uint) error {
 
 	// Also delete assosciatio tables
 	return s.database.Select(clause.Associations).Delete(&schema.Route{}, routeId).Error
+}
+
+func copyHoldInto(from schema.Hold, to *schema.Hold) {
+	to.X = from.X
+	to.Y = from.Y
+	to.Size = from.Size
+	to.Shape = from.Shape
+	to.Angle = from.Angle
 }

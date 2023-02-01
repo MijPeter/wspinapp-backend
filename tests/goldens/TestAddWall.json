@@ -1,0 +1,34 @@
+{
+    "ID": 3,
+    "CreatedAt": "2023-01-01T10:00:00+01:00",
+    "UpdatedAt": "2023-01-01T10:00:00+01:00",
+    "DeletedAt": null,
+    "Holds": [
+        {
+            "ID": 5,
+            "CreatedAt": "2023-01-01T10:00:00+01:00",
+            "UpdatedAt": "2023-01-01T10:00:00+01:00",
+            "DeletedAt": null,
+            "X": 120.03,
+            "Y": 256.43,
+            "Size": 0,
+            "WallID": 3,
+            "Shape": "Circle",
+            "Angle": 0
+        },
+        {
+            "ID": 6,
+            "CreatedAt": "2023-01-01T10:00:00+01:00",
+            "UpdatedAt": "2023-01-01T10:00:00+01:00",
+            "DeletedAt": null,
+            "X": 120.03,
+            "Y": 36.43,
+            "Size": 0,
+            "WallID": 3,
+            "Shape": "circle",
+            "Angle": 0
+        }
+    ],
+    "ImageUrl": "",
+    "ImagePreviewUrl": ""
+}
