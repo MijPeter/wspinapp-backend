@@ -55,6 +55,7 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 	}
 
 	var newStateHolds []schema.Hold
+	var updatedStateHolds []schema.Hold
 	for i := range newWall.Holds {
 		newHold := newWall.Holds[i]
 		stateHold, ok := currentHolds[newHold.ID]
@@ -65,11 +66,8 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 			newStateHolds = append(newStateHolds, newHold)
 		} else {
 			copyHoldInto(newHold, &stateHold)
-			err = s.database.Updates(&stateHold).Error
+			updatedStateHolds = append(updatedStateHolds, stateHold)
 			newStateHolds = append(newStateHolds, stateHold)
-		}
-		if err != nil {
-			return *newWall, err
 		}
 	}
 
@@ -90,16 +88,32 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 			deletedHoldsId = append(deletedHoldsId, stateHold.ID)
 		}
 	}
-	// TODO add error handling
 
 	// remove routes
 	s.database.Select("route_id").Table("route_holds").Where("hold_id = ?", deletedHoldsId).Find(&affectedRoutesId)
 	if len(affectedRoutesId) > 0 {
-		s.database.Preload("route_holds", "route_start_holds", "route_top_hold").Delete(&schema.Route{}, affectedRoutesId)
+		// intermediary holds are not deleted as we're soft deleting route
+		err = s.database.Delete(&schema.Route{}, affectedRoutesId).Error
+		if err != nil {
+			return *newWall, err
+		}
 	}
 
 	// delete holds
-	s.database.Delete(&schema.Hold{}, "id = ?", deletedHoldsId)
+	if len(deletedHoldsId) > 0 {
+		err = s.database.Delete(&schema.Hold{}, "id = ?", deletedHoldsId).Error
+		if err != nil {
+			return *newWall, err
+		}
+	}
+
+	// update holds
+	for i := range updatedStateHolds {
+		err = s.database.Updates(&updatedStateHolds[i]).Error
+	}
+	if err != nil {
+		return *newWall, err
+	}
 
 	// update wall
 	stateWall.Holds = newStateHolds
