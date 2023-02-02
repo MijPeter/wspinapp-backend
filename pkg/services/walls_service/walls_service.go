@@ -202,20 +202,20 @@ func (s *WallsService) GetRoute(wallId uint, routeId uint) (schema.Route, error)
 	return stateRoute, err
 }
 
-func (s *WallsService) UpdateRoute(route *schema.Route, wallId uint, routeId uint) error {
+func (s *WallsService) UpdateRoute(route *schema.Route, wallId uint, routeId uint) (schema.Route, error) {
 	var stateRoute schema.Route
 
 	err := s.database.Preload(clause.Associations).First(&stateRoute, routeId).Error
 
 	if err != nil {
-		return err
+		return *route, err
 	}
 
 	var wall schema.Wall
 	err = s.database.Preload(clause.Associations).First(&wall, wallId).Error
 
 	if err != nil {
-		return err
+		return *route, err
 	}
 
 	holdsMap := make(map[uint]schema.Hold)
@@ -228,7 +228,7 @@ func (s *WallsService) UpdateRoute(route *schema.Route, wallId uint, routeId uin
 	for _, hold := range route.Holds {
 		realHold, ok := holdsMap[hold.ID]
 		if !ok {
-			return errors.New("Hold doesn't belong to wall", 400)
+			return *route, errors.New("Hold doesn't belong to wall", 400)
 		} else {
 			holds = append(holds, realHold)
 		}
@@ -238,18 +238,18 @@ func (s *WallsService) UpdateRoute(route *schema.Route, wallId uint, routeId uin
 	for _, hold := range route.StartHolds {
 		realHold, ok := holdsMap[hold.ID]
 		if !ok {
-			return errors.New("Hold doesn't belong to wall", 400)
+			return *route, errors.New("Hold doesn't belong to wall", 400)
 		} else {
 			startHolds = append(startHolds, realHold)
 		}
 	}
 
 	if len(route.TopHold) > 1 {
-		return errors.New("Too many top holds", 400)
+		return *route, errors.New("Too many top holds", 400)
 	} else if len(route.TopHold) == 1 {
 		realHold, ok := holdsMap[route.TopHold[0].ID]
 		if !ok {
-			return errors.New("Hold doesn't belong to wall", 400)
+			return *route, errors.New("Hold doesn't belong to wall", 400)
 		} else {
 			s.database.Model(&stateRoute).Association("TopHold").Replace([]schema.Hold{realHold})
 		}
@@ -261,7 +261,8 @@ func (s *WallsService) UpdateRoute(route *schema.Route, wallId uint, routeId uin
 	s.database.Model(&stateRoute).Association("Holds").Replace(holds)
 	s.database.Model(&stateRoute).Association("StartHolds").Replace(startHolds)
 
-	return s.database.Save(stateRoute).Error
+	err = s.database.Save(stateRoute).Error
+	return stateRoute, err
 }
 
 func (s *WallsService) DeleteRoute(wallId uint, routeId uint) error {

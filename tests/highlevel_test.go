@@ -41,11 +41,9 @@ func initDb() {
 
 /*
 TODO think about it if it's possible to reset autoincrement count for tables, currently even though entities are deleted, new entities get nextVal IDs
-
 	so instead of getting ID = 1, we get ID = 6 because we've created 5 entities in previous tests. this should be fixed
 	but it's not thaaaat troublesome
-
-	maybe instead of using autoincrement autogenerate IDs (uuid ids) and use random generator with set seed in tests
+	maybe instead of using autoincrement autogenerate IDs (uuid ids) and use random generator with set seed in tests, that should be easy to do but maybe there is something better:D
 */
 func clearDb() {
 	db.Exec("DELETE FROM route_holds WHERE 1=1;")
@@ -222,8 +220,6 @@ func TestUpdateWall(t *testing.T) {
 	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
 }
 
-// TODO WRITE TEST FOR GET WALLS (SHOULD BE FAIRLY EASY)
-
 func TestAddRoute(t *testing.T) {
 	clearDb()
 	db.Create(&test_utils.WallManyHolds)
@@ -392,10 +388,68 @@ func TestDeleteRoute(t *testing.T) {
 
 }
 
-/*
-todo while one might think taht updating route is not needed, it might be needed for grade update or things like that
-	updating holds might not be needed but it's a nice thing to have in case frontend need it
-*/
-//func TestUpdateRoute(t *testing.T) {
-//	TODO
-//}
+func TestGetRoute(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&route)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/walls/%d/routes/%d", test_utils.WallManyHolds.ID, route.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
+}
+
+func TestUpdateRoute(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&route)
+
+	routeJson, _ := json.MarshalIndent(&route, "", "\t")
+	routeJsonString := string(routeJson)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_before_update", routeJsonString), routeJsonString)
+
+	routeUpdated := schema.Route{
+		Holds:      holds[3:6],
+		StartHolds: holds[3:5],
+		TopHold:    holds[5:6],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+
+	updatedRouteJson, _ := json.Marshal(&routeUpdated)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", fmt.Sprintf("/walls/%d/routes/%d", test_utils.WallManyHolds.ID, route.ID), bytes.NewReader(updatedRouteJson))
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_after_update", w.Body.String()), w.Body.String())
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/walls/%d/routes/%d", test_utils.WallManyHolds.ID, route.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_after_update", w.Body.String()), w.Body.String())
+}
