@@ -288,6 +288,19 @@ func TestUpdateWallDeletesRoutesForHoldsThatAreDeleted(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, test_utils.Golden(t.Name()+"_routes", w.Body.String()), w.Body.String())
+
+	// assert that intermediary tables still contain associations (route is soft deleted)
+	var routeHolds, routeStartHolds, routeTopHold []uint
+	db.Select("hold_id").Table("route_holds").Where("route_id = ?", routeThatWillBeDeleted.ID).Find(&routeHolds)
+	db.Select("hold_id").Table("route_start_holds").Where("route_id = ?", routeThatWillBeDeleted.ID).Find(&routeStartHolds)
+	db.Select("hold_id").Table("route_top_hold").Where("route_id = ?", routeThatWillBeDeleted.ID).Find(&routeTopHold)
+
+	assert.True(t, len(routeHolds) == len(routeThatWillBeDeleted.Holds))
+	assert.True(t, len(routeStartHolds) == len(routeThatWillBeDeleted.StartHolds))
+	assert.True(t, len(routeTopHold) == len(routeThatWillBeDeleted.TopHold))
+
+	// assert route is soft deleted
+	assert.Equal(t, nil, db.Find(&schema.Route{}, routeThatWillBeDeleted.ID).Error)
 }
 
 func TestGetRoutes(t *testing.T) {
