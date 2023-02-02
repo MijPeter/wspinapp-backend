@@ -301,6 +301,9 @@ func TestUpdateWallDeletesRoutesForHoldsThatAreDeleted(t *testing.T) {
 
 	// assert route is soft deleted
 	assert.Equal(t, nil, db.Find(&schema.Route{}, routeThatWillBeDeleted.ID).Error)
+
+	// assert removed hold is soft deleted
+	assert.Equal(t, nil, db.Find(&schema.Hold{}, holds[5]).Error)
 }
 
 func TestGetRoutes(t *testing.T) {
@@ -333,3 +336,66 @@ func TestGetRoutes(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
 }
+
+func TestDeleteWall(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&route)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/walls/%d", test_utils.WallManyHolds.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 204, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_wall", w.Body.String()), w.Body.String())
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/walls/%d/routes", test_utils.WallManyHolds.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_routes", w.Body.String()), w.Body.String())
+}
+
+func TestDeleteRoute(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&route)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/walls/%d/routes/%d", test_utils.WallManyHolds.ID, route.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 204, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
+
+}
+
+/*
+todo while one might think taht updating route is not needed, it might be needed for grade update or things like that
+	updating holds might not be needed but it's a nice thing to have in case frontend need it
+*/
+//func TestUpdateRoute(t *testing.T) {
+//	TODO
+//}

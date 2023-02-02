@@ -121,9 +121,12 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 	return stateWall, err
 }
 
-func (s *WallsService) DeleteWall(wallId uint) {
-	s.database.Preload("route_holds", "route_start_holds", "route_top_hold").Delete(&schema.Route{}, "wall_id = ?", wallId)
-	s.database.Preload(clause.Associations).Delete(&schema.Wall{}, wallId)
+func (s *WallsService) DeleteWall(wallId uint) error {
+	err := s.database.Preload("route_holds", "route_start_holds", "route_top_hold").Delete(&schema.Route{}, "wall_id = ?", wallId).Error
+	if err != nil {
+		return err
+	}
+	return s.database.Preload(clause.Associations).Delete(&schema.Wall{}, wallId).Error
 }
 
 func (s *WallsService) GetWalls() []schema.Wall {
@@ -270,19 +273,12 @@ func (s *WallsService) DeleteRoute(wallId uint, routeId uint) error {
 		return err
 	}
 
-	var wall schema.Wall
-	err = s.database.Preload(clause.Associations).First(&wall, wallId).Error
-
-	if err != nil {
-		return err
-	}
-
 	if stateRoute.WallID != wallId {
 		return errors.BadRequest
 	}
 
-	// Also delete assosciatio tables
-	return s.database.Select(clause.Associations).Delete(&schema.Route{}, routeId).Error
+	// intermediary tables are not updated
+	return s.database.Delete(&schema.Route{}, routeId).Error
 }
 
 func copyHoldInto(from schema.Hold, to *schema.Hold) {
