@@ -6,8 +6,6 @@ services:
     restart: unless-stopped
     env_file:
       - '.wspinapp.env'
-    ports:
-      - "5432:5432"
   server:
     container_name: server
     restart: "no"
