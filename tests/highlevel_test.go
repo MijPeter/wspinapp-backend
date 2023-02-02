@@ -41,7 +41,6 @@ func initDb() {
 
 /*
 TODO think about it if it's possible to reset autoincrement count for tables, currently even though entities are deleted, new entities get nextVal IDs
-
 	so instead of getting ID = 1, we get ID = 6 because we've created 5 entities in previous tests. this should be fixed
 	but it's not thaaaat troublesome
 	maybe instead of using autoincrement autogenerate IDs (uuid ids) and use random generator with set seed in tests, that should be easy to do but maybe there is something better:D
