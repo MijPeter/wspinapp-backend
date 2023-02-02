@@ -32,3 +32,28 @@ var WallFull = schema.Wall{
 	ImageUrl:        "abcde",
 	ImagePreviewUrl: "fghij",
 }
+
+var WallManyHolds = schema.Wall{
+	Holds: []schema.Hold{{
+		X:     13.03,
+		Y:     1.43,
+		Shape: "Circle",
+	}, {
+		X: 3,
+		Y: 36.43,
+	}, {
+		X:     13.03,
+		Y:     1.43,
+		Shape: "Circle",
+	}, {
+		X: 3,
+		Y: 36.43,
+	}, {
+		X:     13.03,
+		Y:     1.43,
+		Shape: "Circle",
+	}, {
+		X: 3,
+		Y: 36.43,
+	}},
+}

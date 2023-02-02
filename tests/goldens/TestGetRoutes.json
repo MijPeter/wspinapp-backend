@@ -1,0 +1,184 @@
+[
+    {
+        "ID": 4,
+        "CreatedAt": "2023-01-01T10:00:00+01:00",
+        "UpdatedAt": "2023-01-01T10:00:00+01:00",
+        "DeletedAt": null,
+        "Holds": [
+            {
+                "ID": 12,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 13.03,
+                "Y": 1.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "Circle",
+                "Angle": 0
+            },
+            {
+                "ID": 13,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            },
+            {
+                "ID": 14,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 13.03,
+                "Y": 1.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "Circle",
+                "Angle": 0
+            },
+            {
+                "ID": 15,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            }
+        ],
+        "StartHolds": [
+            {
+                "ID": 13,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            },
+            {
+                "ID": 14,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 13.03,
+                "Y": 1.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "Circle",
+                "Angle": 0
+            }
+        ],
+        "TopHold": [
+            {
+                "ID": 12,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 13.03,
+                "Y": 1.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "Circle",
+                "Angle": 0
+            }
+        ],
+        "WallID": 6
+    },
+    {
+        "ID": 5,
+        "CreatedAt": "2023-01-01T10:00:00+01:00",
+        "UpdatedAt": "2023-01-01T10:00:00+01:00",
+        "DeletedAt": null,
+        "Holds": [
+            {
+                "ID": 15,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            },
+            {
+                "ID": 16,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 13.03,
+                "Y": 1.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "Circle",
+                "Angle": 0
+            },
+            {
+                "ID": 17,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            }
+        ],
+        "StartHolds": [
+            {
+                "ID": 15,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            },
+            {
+                "ID": 16,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 13.03,
+                "Y": 1.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "Circle",
+                "Angle": 0
+            }
+        ],
+        "TopHold": [
+            {
+                "ID": 17,
+                "CreatedAt": "2023-01-01T10:00:00+01:00",
+                "UpdatedAt": "2023-01-01T10:00:00+01:00",
+                "DeletedAt": null,
+                "X": 3,
+                "Y": 36.43,
+                "Size": 0,
+                "WallID": 6,
+                "Shape": "circle",
+                "Angle": 0
+            }
+        ],
+        "WallID": 6
+    }
+]

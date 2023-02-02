@@ -38,6 +38,7 @@ func (s *WallsService) GetWall(wallId uint) (schema.Wall, error) {
 	return wall, err
 }
 
+// TODO refactor so that db calls are at the bottom
 func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wall, error) {
 	var stateWall schema.Wall
 
@@ -45,12 +46,6 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 	if err != nil {
 		return stateWall, err
 	}
-
-	// delete all routes for a newWall
-	s.database.Delete(&schema.Route{}, "wall_id = ?", wallId)
-	// TODO delete only those routes that have their holds removed
-
-	// delete holds that are being removed ass well TODO
 
 	currentHolds := make(map[uint]schema.Hold)
 
@@ -85,28 +80,36 @@ func (s *WallsService) UpdateWall(wallId uint, newWall *schema.Wall) (schema.Wal
 		newHolds[hold.ID] = hold
 	}
 
+	var deletedHoldsId []uint
+	var affectedRoutesId []uint
+
 	for i := range stateWall.Holds {
 		stateHold := stateWall.Holds[i]
 		_, ok := newHolds[stateHold.ID]
 		if !ok {
-			err = s.database.Delete(&stateHold, "id = ?", stateHold.ID).Error
-			log.Printf("Deleting hold with id :%d", stateHold.ID)
-			if err != nil {
-				return *newWall, err
-			}
+			deletedHoldsId = append(deletedHoldsId, stateHold.ID)
 		}
 	}
+	// TODO add error handling
 
+	// remove routes
+	s.database.Select("route_id").Table("route_holds").Where("hold_id = ?", deletedHoldsId).Find(&affectedRoutesId)
+	if len(affectedRoutesId) > 0 {
+		s.database.Preload("route_holds", "route_start_holds", "route_top_hold").Delete(&schema.Route{}, affectedRoutesId)
+	}
+
+	// delete holds
+	s.database.Delete(&schema.Hold{}, "id = ?", deletedHoldsId)
+
+	// update wall
 	stateWall.Holds = newStateHolds
 	err = s.database.Save(&stateWall).Error
 	return stateWall, err
 }
 
 func (s *WallsService) DeleteWall(wallId uint) {
-	// delete all routes for a wall
-	s.database.Delete(&schema.Route{}, "wall_id = ?", wallId)
-	s.database.Delete(&schema.Hold{}, "wall_id = ?", wallId)
-	s.database.Delete(&schema.Wall{}, wallId)
+	s.database.Preload("route_holds", "route_start_holds", "route_top_hold").Delete(&schema.Route{}, "wall_id = ?", wallId)
+	s.database.Preload(clause.Associations).Delete(&schema.Wall{}, wallId)
 }
 
 func (s *WallsService) GetWalls() []schema.Wall {

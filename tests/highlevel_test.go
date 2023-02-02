@@ -39,12 +39,25 @@ func initDb() {
 	})
 }
 
+/*
+TODO think about it if it's possible to reset autoincrement count for tables, currently even though entities are deleted, new entities get nextVal IDs
+
+	so instead of getting ID = 1, we get ID = 6 because we've created 5 entities in previous tests. this should be fixed
+	but it's not thaaaat troublesome
+
+	maybe instead of using autoincrement autogenerate IDs (uuid ids) and use random generator with set seed in tests
+*/
 func clearDb() {
-	db.Unscoped().Where("1 = 1").Delete(schema.Hold{})
+	db.Exec("DELETE FROM route_holds WHERE 1=1;")
+	db.Exec("DELETE FROM route_start_holds WHERE 1=1;")
+	db.Exec("DELETE FROM route_top_hold WHERE 1=1;")
+
 	db.Unscoped().Where("1 = 1").Delete(schema.Route{})
+	db.Unscoped().Where("1 = 1").Delete(schema.Hold{})
 	db.Unscoped().Where("1 = 1").Delete(schema.Wall{})
 }
 
+// TODO move all that util setup methods to some other file so it's easier to read testss
 func initEnv() {
 	os.Setenv("POSTGRES_USER", "test_user")
 	os.Setenv("POSTGRES_PASSWORD", "test_pass")
@@ -116,7 +129,7 @@ func TestAddWall(t *testing.T) {
 			ID:        10,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now()},
-		Holds: []schema.Hold{{
+		Holds: []schema.Hold{{ // TODO fill all fields of one of holds to verify if it's saved correctly
 			Model: gorm.Model{
 				ID:        10,
 				CreatedAt: time.Now(),
@@ -198,7 +211,7 @@ func TestUpdateWall(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, test_utils.Golden(t.Name()+"_1", w.Body.String()), w.Body.String())
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", fmt.Sprintf("/walls/%d", test_utils.WallFull.ID), nil)
@@ -206,5 +219,104 @@ func TestUpdateWall(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, test_utils.Golden(t.Name()+"_2", w.Body.String()), w.Body.String())
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
+}
+
+// TODO WRITE TEST FOR GET WALLS (SHOULD BE FAIRLY EASY)
+
+func TestAddRoute(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+	}
+
+	routeJson, _ := json.Marshal(&route)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", fmt.Sprintf("/walls/%d/routes", test_utils.WallManyHolds.ID), bytes.NewReader(routeJson))
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 201, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
+}
+
+func TestUpdateWallDeletesRoutesForHoldsThatAreDeleted(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&route)
+
+	routeThatWillBeDeleted := schema.Route{
+		Holds:      holds[3:6],
+		StartHolds: holds[3:5],
+		TopHold:    holds[5:6],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&routeThatWillBeDeleted)
+
+	updatedWall := test_utils.WallManyHolds
+	updatedWall.Holds = holds[0:5]
+
+	updateWallJson, _ := json.Marshal(&updatedWall)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("PUT", fmt.Sprintf("/walls/%d", test_utils.WallManyHolds.ID), bytes.NewReader(updateWallJson))
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_wall", w.Body.String()), w.Body.String())
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/walls/%d/routes", test_utils.WallManyHolds.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name()+"_routes", w.Body.String()), w.Body.String())
+}
+
+func TestGetRoutes(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{
+		Holds:      holds[0:4],
+		StartHolds: holds[1:3],
+		TopHold:    holds[0:1],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&route)
+
+	routeOther := schema.Route{
+		Holds:      holds[3:6],
+		StartHolds: holds[3:5],
+		TopHold:    holds[5:6],
+		WallID:     test_utils.WallManyHolds.ID,
+	}
+	db.Create(&routeOther)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/walls/%d/routes", test_utils.WallManyHolds.ID), nil)
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
 }
