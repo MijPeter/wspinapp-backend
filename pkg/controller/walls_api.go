@@ -79,7 +79,12 @@ func (h *routesHandler) DeleteWall(c *gin.Context) {
 		return
 	}
 
-	h.service.WallsService.DeleteWall(wallId)
+	err = h.service.WallsService.DeleteWall(wallId)
+	if err != nil {
+		returnErrorResponse(c, errors.BadRequest)
+		return
+	}
+	c.IndentedJSON(http.StatusNoContent, nil)
 }
 
 func (h *routesHandler) GetWalls(c *gin.Context) {
