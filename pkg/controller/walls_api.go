@@ -176,13 +176,13 @@ func (h *routesHandler) UpdateRoute(c *gin.Context) {
 		return
 	}
 
-	err = h.service.WallsService.UpdateRoute(&newRoute, wallId, routeId)
+	updatedRoute, err := h.service.WallsService.UpdateRoute(&newRoute, wallId, routeId)
 	if err != nil {
 		log.Printf(err.Error())
 		returnErrorResponse(c, errors.BadRequest)
 		return
 	}
-	c.IndentedJSON(http.StatusOK, newRoute)
+	c.IndentedJSON(http.StatusOK, updatedRoute)
 }
 
 func (h *routesHandler) DeleteRoute(c *gin.Context) {
