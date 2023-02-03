@@ -7,11 +7,11 @@ import (
 )
 
 type routesHandler struct {
-	service  services.Service
+	service  services.WebService
 	validate *validator.Validate
 }
 
-func RegisterRoutes(r *gin.Engine, service services.Service) {
+func RegisterRoutes(r *gin.Engine, service services.WebService) {
 	h := &routesHandler{
 		service:  service,
 		validate: validator.New(),
