@@ -18,8 +18,8 @@ type Hold struct {
 type Wall struct {
 	gorm.Model
 	Holds           []Hold `json:"Holds"`
-	ImageUrl        string `json:"ImageUrl"`
-	ImagePreviewUrl string `json:"ImagePreviewUrl"`
+	ImageUrl        string `json:"ImageUrl"`        // should be nullable
+	ImagePreviewUrl string `json:"ImagePreviewUrl"` // should be nullable remember to update cron wall
 }
 
 type Route struct {

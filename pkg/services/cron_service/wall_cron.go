@@ -20,7 +20,7 @@ func (c *CronService) runWallCron() {
 
 func (c *CronService) deleteAllDanglingWalls() {
 	// Get all walls without imageUrls that are older than 24 hours
-	err := c.database.Preload(clause.Associations).Where("image_url = ? or image_preview_url = ?", "", "").Delete(&schema.Wall{}).Error
+	err := c.database.Preload(clause.Associations).Where("image_url = ?", "").Delete(&schema.Wall{}).Error
 	if err != nil {
 		log.Printf("Failed to delete dangling walls. Reason\n%s", err.Error())
 		return
