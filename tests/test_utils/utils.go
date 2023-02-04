@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var Now = time.Date(2023, 1, 1, 10, 0, 0, 0, time.Local)
+var Now, _ = time.Parse(time.RFC3339, "2006-01-02T15:04:05+01:00")
 
 var WallMinimal = schema.Wall{}
 
