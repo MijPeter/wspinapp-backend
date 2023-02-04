@@ -7,19 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type Service struct {
+	WebService  WebService
+	CronService cron_service.CronService
+}
+
 type WebService struct {
 	WallsService walls_service.WallsService
 }
 
-type CronService struct {
-	CronService cron_service.CronService
-}
-
-func New(db *gorm.DB, imgRepository imgrepository.ImageRepository) (WebService, CronService) {
-	return WebService{
-			WallsService: walls_service.New(db, imgRepository),
-		},
-		CronService{
-			CronService: cron_service.New(db, imgRepository),
-		}
+func New(db *gorm.DB, imgRepository imgrepository.ImageRepository) Service {
+	return Service{
+		WebService:  WebService{WallsService: walls_service.New(db, imgRepository)},
+		CronService: cron_service.New(db, imgRepository),
+	}
 }

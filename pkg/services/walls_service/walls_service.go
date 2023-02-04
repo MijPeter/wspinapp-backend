@@ -126,6 +126,12 @@ func (s *WallsService) DeleteWall(wallId uint) error {
 	if err != nil {
 		return err
 	}
+
+	err = s.database.Where("wall_id = ?", wallId).Delete(&schema.Hold{}).Error
+	if err != nil {
+		return err
+	}
+
 	return s.database.Preload(clause.Associations).Delete(&schema.Wall{}, wallId).Error
 }
 

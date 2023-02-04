@@ -19,11 +19,16 @@ func New(db *gorm.DB, imageRepository imgrepository.ImageRepository) CronService
 }
 
 func (c *CronService) Run() {
+	go c.runImageCron()
+	go c.runWallCron()
+}
+
+func (c *CronService) runImageCron() {
 	// in theory should be run at 3 am, but this is not that important right now
 	for true {
+		time.Sleep(HOURS * time.Hour)
 		log.Println("DING DING DING, running deleteAllDanglingImages cron job")
 		c.deleteAllDanglingImages()
-		time.Sleep(HOURS * time.Hour)
 	}
 }
 

@@ -16,9 +16,9 @@ func main() {
 	router.SetTrustedProxies(nil)       // TODO add google account auth
 	router.MaxMultipartMemory = 8 << 20 // 8MiB
 
-	webService, cronService := services.New(db, imgrepository.New())
-	controller.RegisterRoutes(router, webService)
-	go cronService.CronService.Run()
+	service := services.New(db, imgrepository.New())
+	controller.RegisterRoutes(router, service.WebService)
+	service.CronService.Run()
 	router.Run()
 }
 

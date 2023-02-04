@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"example/wspinapp-backend/pkg/common"
+	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
 	"example/wspinapp-backend/pkg/common/schema"
 	"example/wspinapp-backend/pkg/controller"
 	"example/wspinapp-backend/pkg/services"
@@ -28,6 +29,14 @@ func (i *ImageRepositoryMock) Upload(_ interface{}) (string, error) {
 	return i.returnString, nil
 }
 
+func (i *ImageRepositoryMock) Assets() ([]imgrepository.Asset, error) {
+	return []imgrepository.Asset{}, nil
+}
+
+func (i *ImageRepositoryMock) DeleteAssets(_ []string) error {
+	return nil
+}
+
 var router *gin.Engine
 var db *gorm.DB
 
@@ -41,6 +50,7 @@ func initDb() {
 
 /*
 TODO think about it if it's possible to reset autoincrement count for tables, currently even though entities are deleted, new entities get nextVal IDs
+
 	so instead of getting ID = 1, we get ID = 6 because we've created 5 entities in previous tests. this should be fixed
 	but it's not thaaaat troublesome
 	maybe instead of using autoincrement autogenerate IDs (uuid ids) and use random generator with set seed in tests, that should be easy to do but maybe there is something better:D
@@ -75,7 +85,7 @@ func TestMain(m *testing.M) {
 	router.SetTrustedProxies(nil)
 	router.MaxMultipartMemory = 8 << 20 // 8MiB
 	service := services.New(db, &ImageRepositoryMock{"https://static.wikia.nocookie.net"})
-	controller.RegisterRoutes(router, service)
+	controller.RegisterRoutes(router, service.WebService)
 
 	log.Println("Running tests")
 
@@ -362,6 +372,10 @@ func TestDeleteWall(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, test_utils.Golden(t.Name()+"_routes", w.Body.String()), w.Body.String())
+
+	var softDeletedHolds []schema.Hold
+	db.Where(schema.Hold{WallID: test_utils.WallManyHolds.ID}).Find(&softDeletedHolds)
+	assert.Equal(t, []schema.Hold{}, softDeletedHolds)
 }
 
 func TestDeleteRoute(t *testing.T) {
@@ -385,7 +399,6 @@ func TestDeleteRoute(t *testing.T) {
 
 	assert.Equal(t, 204, w.Code)
 	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
-
 }
 
 func TestGetRoute(t *testing.T) {

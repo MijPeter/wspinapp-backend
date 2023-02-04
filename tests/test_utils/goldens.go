@@ -8,7 +8,7 @@ import (
 // Golden If golden already exists then it is loaded and returned.
 // Otherwise, create new golden and return its value.
 func Golden(name string, actual string) string {
-	name = "goldens/" + name + ".json"
+	name = "_goldens/" + name + ".json"
 	if fileExists(name) {
 		return string(load(name))
 	} else {
