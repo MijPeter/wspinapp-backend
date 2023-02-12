@@ -253,6 +253,25 @@ func TestAddRoute(t *testing.T) {
 	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
 }
 
+func TestAddRouteNoHolds(t *testing.T) {
+	clearDb()
+	db.Create(&test_utils.WallManyHolds)
+	holds := test_utils.WallManyHolds.Holds
+
+	assert.Equal(t, 6, len(holds))
+
+	route := schema.Route{}
+
+	routeJson, _ := json.Marshal(&route)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", fmt.Sprintf("/walls/%d/routes", test_utils.WallManyHolds.ID), bytes.NewReader(routeJson))
+	req.SetBasicAuth("wspinapp", "wspinapp")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, 201, w.Code)
+	assert.Equal(t, test_utils.Golden(t.Name(), w.Body.String()), w.Body.String())
+}
+
 func TestUpdateWallDeletesRoutesForHoldsThatAreDeleted(t *testing.T) {
 	clearDb()
 	db.Create(&test_utils.WallManyHolds)

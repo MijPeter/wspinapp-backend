@@ -162,7 +162,7 @@ func (s *WallsService) AddRoute(route *schema.Route, wallId uint) error {
 		holdsMap[hold.ID] = hold
 	}
 
-	var holds []schema.Hold
+	var holds = make([]schema.Hold, 0)
 	for _, hold := range route.Holds {
 		realHold, ok := holdsMap[hold.ID]
 		if !ok {
@@ -172,7 +172,7 @@ func (s *WallsService) AddRoute(route *schema.Route, wallId uint) error {
 		}
 	}
 
-	var startHolds []schema.Hold
+	var startHolds = make([]schema.Hold, 0)
 	for _, hold := range route.StartHolds {
 		realHold, ok := holdsMap[hold.ID]
 		if !ok {
@@ -181,7 +181,6 @@ func (s *WallsService) AddRoute(route *schema.Route, wallId uint) error {
 			startHolds = append(startHolds, realHold)
 		}
 	}
-
 	if len(route.TopHold) > 1 {
 		return errors.New("Too many top holds", 400)
 	} else if len(route.TopHold) == 1 {
@@ -191,6 +190,8 @@ func (s *WallsService) AddRoute(route *schema.Route, wallId uint) error {
 		} else {
 			route.TopHold[0] = realHold
 		}
+	} else {
+		route.TopHold = make([]schema.Hold, 0)
 	}
 
 	route.Holds = holds

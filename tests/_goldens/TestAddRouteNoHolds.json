@@ -1,0 +1,10 @@
+{
+    "ID": 2,
+    "CreatedAt": "2006-01-02T15:04:05+01:00",
+    "UpdatedAt": "2006-01-02T15:04:05+01:00",
+    "DeletedAt": null,
+    "Holds": [],
+    "StartHolds": [],
+    "TopHold": [],
+    "WallID": 6
+}

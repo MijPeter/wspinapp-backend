@@ -1,21 +1,9 @@
 {
-    "ID": 8,
+    "ID": 9,
     "CreatedAt": "2006-01-02T15:04:05+01:00",
     "UpdatedAt": "2006-01-02T15:04:05+01:00",
     "DeletedAt": null,
     "Holds": [
-        {
-            "ID": 15,
-            "CreatedAt": "2006-01-02T15:04:05+01:00",
-            "UpdatedAt": "2006-01-02T15:04:05+01:00",
-            "DeletedAt": null,
-            "X": 3,
-            "Y": 36.43,
-            "Size": 0,
-            "WallID": 6,
-            "Shape": "circle",
-            "Angle": 0
-        },
         {
             "ID": 12,
             "CreatedAt": "2006-01-02T15:04:05+01:00",
@@ -50,6 +38,18 @@
             "Size": 0,
             "WallID": 6,
             "Shape": "Circle",
+            "Angle": 0
+        },
+        {
+            "ID": 15,
+            "CreatedAt": "2006-01-02T15:04:05+01:00",
+            "UpdatedAt": "2006-01-02T15:04:05+01:00",
+            "DeletedAt": null,
+            "X": 3,
+            "Y": 36.43,
+            "Size": 0,
+            "WallID": 6,
+            "Shape": "circle",
             "Angle": 0
         }
     ],
