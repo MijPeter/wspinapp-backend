@@ -4,11 +4,20 @@ import (
 	"example/wspinapp-backend/pkg/services"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type routesHandler struct {
 	service  services.WebService
 	validate *validator.Validate
+}
+
+func prometheusHandler() gin.HandlerFunc {
+	h := promhttp.Handler()
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
 }
 
 func RegisterRoutes(r *gin.Engine, service services.WebService) {
@@ -19,6 +28,8 @@ func RegisterRoutes(r *gin.Engine, service services.WebService) {
 
 	publicRouter := r.Group("")
 	publicRouter.GET("/ping", h.Pong)
+
+	publicRouter.GET("/metrics", prometheusHandler())
 
 	router := r.Group("/walls")
 	router.Use(gin.BasicAuth(gin.Accounts{
