@@ -45,7 +45,7 @@ func attachMetrics() gin.HandlerFunc {
 		duration := time.Since(start)
 
 		// Get route (path), method and status code from the current context
-		route := c.Request.URL.Path // Or use c.FullPath() for the matched route pattern
+		route := c.FullPath()
 		method := c.Request.Method
 		statusCode := strconv.Itoa(c.Writer.Status())
 
