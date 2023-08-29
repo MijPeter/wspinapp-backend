@@ -19,4 +19,4 @@ FROM base as app
 # Build the Go app
 RUN go build -o /server ./cmd
 # Run the binary program produced by `go install`
-CMD ["/server"]
+CMD ["/bin/sh", "-c", "/server >> /logs/wspinapp.log 2>&1"]
