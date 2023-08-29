@@ -19,6 +19,6 @@ services:
     depends_on:
       - db
     volumes:
-      - /logs/wspinapp.log:/logs/wspinapp.log
+      - /var/log/wspinapp.log:/logs/wspinapp.log
     env_file:
       - '.wspinapp.env'
