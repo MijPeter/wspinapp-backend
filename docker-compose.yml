@@ -10,7 +10,7 @@ services:
       - "5432:5432"
   server:
     container_name: server
-    restart: "no"
+    restart: unless-stopped
     build:
       context: .
       target: app
@@ -18,5 +18,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    volumes:
+      - /logs/wspinapp.log:/logs/wspinapp.log
     env_file:
       - '.wspinapp.env'
