@@ -6,24 +6,25 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
 	"strconv"
 	"time"
 )
 
 type routesHandler struct {
-	service  services.WebService
-	validate *validator.Validate
+	service             services.WebService
+	validate            *validator.Validate
+	metricsHandler      http.Handler
+	metricsHistogramVec *prometheus.HistogramVec
 }
 
-func prometheusHandler() gin.HandlerFunc {
-	h := promhttp.Handler()
-
+func prometheusHandler(handler http.Handler) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+		handler.ServeHTTP(c.Writer, c.Request)
 	}
 }
 
-func attachMetrics() gin.HandlerFunc {
+func initPrometheus() *prometheus.HistogramVec {
 	responseTimeHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "wspinapp",
 		Name:      "http_server_request_duration_seconds",
@@ -31,7 +32,10 @@ func attachMetrics() gin.HandlerFunc {
 	}, []string{"route", "method", "status_code"})
 
 	prometheus.MustRegister(responseTimeHistogram)
+	return responseTimeHistogram
+}
 
+func attachMetrics(responseTimeHistogram *prometheus.HistogramVec) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
@@ -52,19 +56,21 @@ func attachMetrics() gin.HandlerFunc {
 
 func RegisterRoutes(r *gin.Engine, service services.WebService) {
 	h := &routesHandler{
-		service:  service,
-		validate: validator.New(),
+		service:             service,
+		validate:            validator.New(),
+		metricsHandler:      promhttp.Handler(),
+		metricsHistogramVec: initPrometheus(),
 	}
 
 	publicRouter := r.Group("")
 	publicRouter.GET("/ping", h.Pong)
 
-	publicRouter.GET("/metrics", prometheusHandler())
+	publicRouter.GET("/metrics", prometheusHandler(h.metricsHandler))
 
 	router := r.Group("/walls")
 	router.Use(gin.BasicAuth(gin.Accounts{
 		"wspinapp": "wspinapp",
-	}), attachMetrics())
+	}), attachMetrics(h.metricsHistogramVec))
 
 	router.POST("", h.AddWall)
 	router.GET("", h.GetWalls)
