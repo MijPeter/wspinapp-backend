@@ -1,7 +1,7 @@
 package common
 
 import (
-	"example/wspinapp-backend/pkg/common/schema"
+	"example/wspinapp-backend/internal/common/schema"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

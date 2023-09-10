@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"example/wspinapp-backend/pkg/services"
+	"example/wspinapp-backend/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/prometheus/client_golang/prometheus"

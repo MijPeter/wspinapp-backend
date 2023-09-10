@@ -1,10 +1,10 @@
 package main
 
 import (
-	"example/wspinapp-backend/pkg/common"
-	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
-	"example/wspinapp-backend/pkg/controller"
-	"example/wspinapp-backend/pkg/services"
+	"example/wspinapp-backend/internal/common"
+	"example/wspinapp-backend/internal/common/adapters/imgrepository"
+	"example/wspinapp-backend/internal/controller"
+	"example/wspinapp-backend/internal/services"
 	"github.com/gin-gonic/gin"
 )
 

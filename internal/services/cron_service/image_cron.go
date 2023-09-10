@@ -1,7 +1,7 @@
 package cron_service
 
 import (
-	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
+	"example/wspinapp-backend/internal/common/adapters/imgrepository"
 	"gorm.io/gorm"
 	"log"
 	"time"

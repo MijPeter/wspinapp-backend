@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"example/wspinapp-backend/pkg/common/errors"
-	"example/wspinapp-backend/pkg/common/schema"
+	"example/wspinapp-backend/internal/common/errors"
+	"example/wspinapp-backend/internal/common/schema"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
-	"example/wspinapp-backend/pkg/services/cron_service"
-	"example/wspinapp-backend/pkg/services/walls_service"
+	"example/wspinapp-backend/internal/common/adapters/imgrepository"
+	"example/wspinapp-backend/internal/services/cron_service"
+	"example/wspinapp-backend/internal/services/walls_service"
 	"gorm.io/gorm"
 )
 
