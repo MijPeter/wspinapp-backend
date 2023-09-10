@@ -6,11 +6,12 @@ import (
 	"example/wspinapp-backend/internal/controller"
 	"example/wspinapp-backend/internal/services"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func main() {
 	// todo probably create some simple adapter for db for cleanliness sake
-	db := common.InitDb()
+	db := common.ConnectDb(&gorm.Config{})
 
 	router := gin.Default()
 	router.SetTrustedProxies(nil)       // TODO add google account auth

@@ -9,20 +9,8 @@ import (
 	"time"
 )
 
-func InitDb() *gorm.DB {
-	db := connectDb(&gorm.Config{})
-
-	db.AutoMigrate(
-		&schema.Wall{},
-		&schema.Route{},
-		&schema.Hold{},
-	)
-
-	return db
-}
-
 func InitDbWithConfig(cfg *gorm.Config) *gorm.DB {
-	db := connectDb(cfg)
+	db := ConnectDb(cfg)
 
 	db.AutoMigrate(
 		&schema.Wall{},
@@ -33,7 +21,7 @@ func InitDbWithConfig(cfg *gorm.Config) *gorm.DB {
 	return db
 }
 
-func connectDb(cfg *gorm.Config) *gorm.DB {
+func ConnectDb(cfg *gorm.Config) *gorm.DB {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		EnvDBHost(), EnvDBPort(), EnvDBUser(), EnvDBPassword(), EnvDBName())

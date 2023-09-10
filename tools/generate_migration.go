@@ -2,14 +2,17 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"example/wspinapp-backend/internal/common"
 	"fmt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func setEnvFromFile(filePath string) error {
@@ -39,10 +42,32 @@ func setEnvFromFile(filePath string) error {
 	return scanner.Err()
 }
 
+// DiscardLogger struct that implements the Interface and discards all logs
+type DiscardLogger struct{}
+
+// LogMode no-op
+func (l *DiscardLogger) LogMode(level logger.LogLevel) logger.Interface {
+	return l
+}
+
+// Info no-op
+func (l *DiscardLogger) Info(_ context.Context, _ string, _ ...interface{}) {}
+
+// Warn no-op
+func (l *DiscardLogger) Warn(_ context.Context, _ string, _ ...interface{}) {}
+
+// Error no-op
+func (l *DiscardLogger) Error(_ context.Context, _ string, _ ...interface{}) {}
+
+// Trace no-op
+func (l *DiscardLogger) Trace(_ context.Context, _ time.Time, _ func() (string, int64), _ error) {}
+
 func generateMigration() {
+
 	os.Setenv("POSTGRES_HOST", "wspinapp-backend.ddns.net")
 	common.InitDbWithConfig(&gorm.Config{
 		DryRun: true,
+		Logger: &DiscardLogger{},
 	})
 }
 

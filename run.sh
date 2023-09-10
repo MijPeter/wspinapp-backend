@@ -7,9 +7,10 @@ Usage: $0 [OPTION]
 Run the server in different modes.
 
 Options:
-    --test                 Run the server in test mode.
-    --fast                 Run tests without bringing up all services.
-    --generate-goldens     Re-generate golden files when tests don't match.
+    --test                      Run the server in test mode.
+    --fast                      Run tests without bringing up all services.
+    --generate-goldens          Re-generate golden files when tests don't match.
+    --migrate migration_name    Run the migration tool for a given migration name.
 
 No option will run the server in normal mode.
 EOF
@@ -38,6 +39,14 @@ while [ "$#" -gt 0 ]; do
             # Implement logic to re-generate golden files here. Placeholder for now.
             echo "Re-generating golden files..."
             shift
+            ;;
+        --migrate)
+            if [ -z "$2" ]; then
+              echo "Please provide a migration name after the 'migrate' command."
+              exit 1
+            fi
+            go run tools/generate_migration.go migrations "$2" .wspinapp.env
+            shift 2
             ;;
         -h|--help)
             show_help
