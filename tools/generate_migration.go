@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"example/wspinapp-backend/internal/common"
 	"fmt"
 	"gorm.io/gorm"
@@ -8,27 +9,48 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
+func setEnvFromFile(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		parts := strings.SplitN(line, "=", 2) // Split the string into at most 2 parts
+		if len(parts) != 2 {
+			fmt.Printf("Ignoring invalid line: %s\n", line)
+			continue
+		}
+
+		key := parts[0]
+		value := parts[1]
+
+		if err := os.Setenv(key, value); err != nil {
+			fmt.Printf("Failed to set environment variable for key: %s, error: %v\n", key, err)
+		}
+	}
+
+	return scanner.Err()
+}
+
 func generateMigration() {
+	os.Setenv("POSTGRES_HOST", "wspinapp-backend.ddns.net")
 	common.InitDbWithConfig(&gorm.Config{
 		DryRun: true,
 	})
 }
 
-func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run script.go /path/to/folder name_of_new_migration")
-		return
-	}
-
-	inputPath := os.Args[1]
-	migrationName := os.Args[2]
-
+func createFile(inputPath string, migrationName string) (*os.File, error) {
 	files, err := os.ReadDir(inputPath)
 	if err != nil {
 		fmt.Println("Error reading directory:", err)
-		return
+		return nil, err
 	}
 
 	highestNumber := 0
@@ -51,16 +73,40 @@ func main() {
 	newFileName := fmt.Sprintf("%03d-%s", nextNumber, migrationName)
 	newFilePath := filepath.Join(inputPath, newFileName)
 
-	file, err := os.Create(newFilePath)
+	return os.Create(newFilePath)
+}
+
+func main() {
+	if len(os.Args) < 4 {
+		fmt.Println("Usage: go run script.go /path/to/folder name_of_new_migration")
+		return
+	}
+
+	inputPath := os.Args[1]
+	migrationName := os.Args[2] + ".sql"
+	envFilePath := os.Args[3]
+
+	err := setEnvFromFile(envFilePath)
+	if err != nil {
+		fmt.Println("Error loading environment from file:", err)
+		return
+	}
+
+	file, err := createFile(inputPath, migrationName)
 	if err != nil {
 		fmt.Println("Error creating new file:", err)
 		return
 	}
 
-	_, err = file.WriteString(generateMigration())
-	if err != nil {
-		fmt.Println("Error creating new file:", err)
-		return
-	}
-	fmt.Printf("Created empty file: %s\n", newFilePath)
+	func() {
+		out := os.Stdout
+		err := os.Stderr
+		os.Stdout = file
+		os.Stderr = file
+		generateMigration()
+		os.Stdout = out
+		os.Stderr = err
+	}()
+
+	fmt.Println("Created migration file:", migrationName)
 }

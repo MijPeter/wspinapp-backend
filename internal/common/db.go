@@ -45,8 +45,7 @@ func connectDb(cfg *gorm.Config) *gorm.DB {
 			return db
 		} else {
 			time.Sleep(1 * time.Second)
-			log.Println("Couldn't connect to db, retrying in a moment")
-			log.Println(dsn)
+			log.Printf("Couldn't connect to db, retrying in a moment %s\n", err)
 		}
 	}
 }
