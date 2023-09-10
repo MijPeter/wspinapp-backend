@@ -1,16 +1,17 @@
 package main
 
 import (
-	"example/wspinapp-backend/pkg/common"
-	"example/wspinapp-backend/pkg/common/adapters/imgrepository"
-	"example/wspinapp-backend/pkg/controller"
-	"example/wspinapp-backend/pkg/services"
+	"example/wspinapp-backend/internal/common"
+	"example/wspinapp-backend/internal/common/adapters/imgrepository"
+	"example/wspinapp-backend/internal/controller"
+	"example/wspinapp-backend/internal/services"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func main() {
 	// todo probably create some simple adapter for db for cleanliness sake
-	db := common.InitDb()
+	db := common.ConnectDb(&gorm.Config{})
 
 	router := gin.Default()
 	router.SetTrustedProxies(nil)       // TODO add google account auth

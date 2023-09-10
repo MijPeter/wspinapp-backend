@@ -1,7 +1,7 @@
 package test_utils
 
 import (
-	"example/wspinapp-backend/pkg/common/schema"
+	"example/wspinapp-backend/internal/common/schema"
 	"time"
 )
 

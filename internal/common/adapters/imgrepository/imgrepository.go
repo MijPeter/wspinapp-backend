@@ -2,7 +2,7 @@ package imgrepository
 
 import (
 	"context"
-	"example/wspinapp-backend/pkg/common"
+	"example/wspinapp-backend/internal/common"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"

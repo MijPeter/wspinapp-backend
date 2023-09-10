@@ -1,7 +1,7 @@
 package cron_service
 
 import (
-	"example/wspinapp-backend/pkg/common/schema"
+	"example/wspinapp-backend/internal/common/schema"
 	"gorm.io/gorm/clause"
 	"log"
 	"time"
